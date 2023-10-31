@@ -1,0 +1,25 @@
+Start zookeeper:
+
+    bin/zkServer.sh start
+    
+    bin/zkServer.sh status
+
+
+Start kafka (after zookeeper):
+
+    ->Utiliza el archivo server.properties.
+    bin/kafka-server-start.sh config/server.properties
+
+
+Crear particiones kafka:
+
+    bin/kafka-topics.sh --create --topic my-topic --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+    bin/kafka-topics.sh --delete --topic my-topic --bootstrap-server localhost:9092
+
+
+Brokers kafka en zookeeper:
+
+    bin/zkCli.sh -server localhost:2181
+        ls /brokers/ids
+        ls /brokers/topics
+        get /brokers/ids/0
