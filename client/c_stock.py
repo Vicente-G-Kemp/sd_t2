@@ -4,21 +4,17 @@ import sqlite3
 con = sqlite3.connect("huesillo.db")
 cur = con.cursor()
 
-cur.execute("""SELECT name FROM sqlite_master WHERE type='table';""")
-print(cur.fetchall())
-
 consumer_config = {
     'bootstrap.servers': 'PLAINTEXT://:9092', 
     'group.id': 'test-consumer-group',
-    #'auto.offset.reset': 'earliest' 
 }
 
 consumer = Consumer(consumer_config)
 
-topic = 'registros'
-#consumer.subscribe([topic])
+topic = 'g_stock'
 
-consumer.assign([TopicPartition('registros', 1)])
+consumer.assign([TopicPartition('g_stock', 0)])
+
 while True:
     msg = consumer.poll(1.0) 
 
@@ -30,9 +26,11 @@ while True:
         else:
             print(f"Error: {msg.error()}")
     else:
-        print(f"Received message: {msg.key()}: {msg.value()}")
+        print(f"Received message (STOCK): {msg.value()}")
         data_list = str(msg.value().decode('utf-8')).split(",")
         print(data_list)
-        print(data_list[0])
-        cur.execute("INSERT INTO maestro (username, pass, email) VALUES (?, ?, ?)", (data_list[0], data_list[1], data_list[2]))
-        con.commit()
+        try:
+            cur.execute("UPDATE stock SET current_stock = ? WHERE master_id = ?", (int(data_list[1]), int(data_list[0]),))
+            con.commit()
+        except:
+            print("Registry Error - stock")
