@@ -22,9 +22,7 @@ while True:
     print("\nSelect an action:")
     print("1. Add a Master")
     print("2. Simulate")
-    print("3. Stop producers")
     print("7. Clear database")
-    print("8. ")
     print("9. exit")
     choice = input("Standing by... ")
 

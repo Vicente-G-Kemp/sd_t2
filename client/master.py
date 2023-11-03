@@ -1,4 +1,5 @@
 from confluent_kafka import Producer
+from confluent_kafka.admin import AdminClient
 import socket
 import random
 import time
@@ -15,22 +16,24 @@ import time
 def master_routine(master_id):
 
     producer_config = {
-    'bootstrap.servers': 'PLAINTEXT://:9092',
-    'client.id': socket.gethostname()
+        'bootstrap.servers': 'PLAINTEXT://:9092, PLAINTEXT://:9093',
+        'client.id': socket.gethostname()
     }
+
     producer = Producer(producer_config)
 
     topic = 'r_ventas'
     topic1 = 'g_stock'
 
     precios = (100, 200, 300)
-    # default_stock_limit = random.randint(8, 16)
-    default_stock_limit = 3
+    default_stock_limit = random.randint(8, 16)
+    # default_stock_limit = 3
     sales = 0
     moneh = 0
 
     while True:
-        w_time = random.randint(1,2)
+        # w_time = random.randint(1,2)
+        w_time = random.randint(5,8)
         time.sleep(w_time)
         sales += 1
         moneh += precios[random.randint(0,2)]

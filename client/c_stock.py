@@ -1,13 +1,16 @@
 from confluent_kafka import Consumer, TopicPartition, KafkaError
+from confluent_kafka.admin import AdminClient
 import sqlite3
 
 con = sqlite3.connect("huesillo.db")
 cur = con.cursor()
 
 consumer_config = {
-    'bootstrap.servers': 'PLAINTEXT://:9092', 
+    'bootstrap.servers': 'PLAINTEXT://:9092, PLAINTEXT://:9093', 
     'group.id': 'test-consumer-group',
+    'auto.offset.reset': 'earliest',
 }
+
 
 consumer = Consumer(consumer_config)
 
@@ -26,9 +29,9 @@ while True:
         else:
             print(f"Error: {msg.error()}")
     else:
-        print(f"Received message (STOCK): {msg.value()}")
+        # print(f"Received message (STOCK): {msg.value()}")
         data_list = str(msg.value().decode('utf-8')).split(",")
-        print(data_list)
+        # print(data_list)
         try:
             cur.execute("UPDATE stock SET current_stock = ? WHERE master_id = ?", (int(data_list[1]), int(data_list[0]),))
             con.commit()

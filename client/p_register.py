@@ -1,10 +1,13 @@
 from confluent_kafka import Producer
+from confluent_kafka.admin import AdminClient
 import socket
-
+import time
 producer_config = {
-    'bootstrap.servers': 'PLAINTEXT://:9092',
-    'client.id': socket.gethostname()
+    'bootstrap.servers': 'PLAINTEXT://:9092, PLAINTEXT://:9093',
+    'client.id': socket.gethostname(),
 }
+    
+
 producer = Producer(producer_config)
 topic = 'registros'
 

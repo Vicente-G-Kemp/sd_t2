@@ -2,14 +2,17 @@ from confluent_kafka import Consumer, TopicPartition, KafkaError
 import sqlite3
 from master import master_routine
 from threading import Thread
+from confluent_kafka.admin import AdminClient
 
 con = sqlite3.connect("huesillo.db")
 cur = con.cursor()
 
 consumer_config = {
-    'bootstrap.servers': 'PLAINTEXT://:9092', 
+    'bootstrap.servers': 'PLAINTEXT://:9092, PLAINTEXT://:9093', 
     'group.id': 'test-consumer-group',
+    'auto.offset.reset': 'earliest',
 }
+
 
 consumer = Consumer(consumer_config)
 
@@ -28,7 +31,7 @@ while True:
         else:
             print(f"Error: {msg.error()}")
     else:
-        print(f"Received message: {msg.value()}")
+        print(f"Received message: {msg.value()} BROKER 0 - NORMAL")
         data_list = str(msg.value().decode('utf-8')).split(",")
         try:
             cur.execute("INSERT INTO maestro (username, pass, email) VALUES (?, ?, ?)", (data_list[0], data_list[1], data_list[2]))
@@ -37,7 +40,7 @@ while True:
             cur.execute("INSERT INTO ventas(master_id, current_ventas, current_earnings) VALUES (?, ?, ?)",(int(result[0]), 0, 0))
             cur.execute("INSERT INTO stock(master_id, current_stock) VALUES (?, ?)",(int(result[0]), 0))
             con.commit()
-            print(result[0])
+            # print(result[0])
         except:
             print("Registry Error (register)")
         else:
